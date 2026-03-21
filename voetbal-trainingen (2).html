@@ -251,8 +251,8 @@ let historieOpen = false;
 let lightboxImgs = [], lightboxIdx = 0;
 
 // Firebase save/delete worden later ingesteld vanuit het module script
-let _saveToFirebase = async () => alert('Database nog niet verbonden, probeer opnieuw.');
-let _deleteFromFirebase = async () => alert('Database nog niet verbonden, probeer opnieuw.');
+let _saveToFirebase = async (t) => { console.log('Firebase nog niet klaar'); };
+let _deleteFromFirebase = async (id) => { console.log('Firebase nog niet klaar'); };
 
 // ---- Datum helpers ----
 function getNextWeekBounds() {
@@ -617,14 +617,14 @@ async function deleteTraining() {
 }
 
 // Render alvast zonder data
-renderOverzicht();
+window.renderOverzicht = renderOverzicht;
+window.setSyncStatus = setSyncStatus;
+window.renderOverzicht();
 </script>
 
-<script type="module">
-// Firebase laadt apart, koppelt aan de _save/_delete functies
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyDjTY6XFpfGdBt-8Iz7M1qWT44rys7uWi4",
   authDomain: "app-voor-voetbaltrainingen.firebaseapp.com",
@@ -634,30 +634,39 @@ const firebaseConfig = {
   appId: "1:869029037781:web:84f134fcdc051f2567445c"
 };
 
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// Koppel Firebase functies aan de globale variabelen
+async function laadTrainingen() {
+  try {
+    const snap = await db.collection('trainingen').get();
+    trainingen = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setSyncStatus('ok', 'Verbonden — ' + new Date().toLocaleTimeString('nl-NL', {hour:'2-digit',minute:'2-digit'}));
+    renderOverzicht();
+  } catch(err) {
+    setSyncStatus('error', 'Fout: ' + (err.code || err.message || String(err)));
+  }
+}
+
 window._saveToFirebase = async function(t) {
   const id = t.id || crypto.randomUUID();
-  await setDoc(doc(db, 'trainingen', id), {
+  const data = {
     naam: t.naam, dag: t.dag, datum: t.datum||'',
     intensiteit: t.intensiteit, notes: t.notes||'', oefeningen: t.oefeningen
-  });
+  };
+  await db.collection('trainingen').doc(id).set(data);
+  await laadTrainingen();
   return id;
 };
 
 window._deleteFromFirebase = async function(id) {
-  await deleteDoc(doc(db, 'trainingen', id));
+  await db.collection('trainingen').doc(id).delete();
+  await laadTrainingen();
 };
 
-onSnapshot(collection(db, 'trainingen'), snap => {
-  window.trainingen = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  setSyncStatus('ok', 'Live verbonden — zichtbaar voor Michel en Pim');
-  renderOverzicht();
-}, err => {
-  setSyncStatus('error', 'Verbindingsfout: ' + (err.code || err.message));
-});
+// Start
+laadTrainingen();
+setInterval(laadTrainingen, 30000);
 </script>
 
 </body>
