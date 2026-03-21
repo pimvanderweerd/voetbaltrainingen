@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Voetbal Trainingen</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; min-height: 100vh; padding: 1rem; }
+    .app { max-width: 600px; margin: 0 auto; padding: 0.75rem 0; }
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+    .header h1 { font-size: 17px; font-weight: 500; color: #1a1a1a; flex: 1; }
+    .back-btn { background: none; border: 1px solid #ddd; border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; color: #555; min-height: 40px; font-family: inherit; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+    .tab { flex: 1; padding: 10px 8px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-size: 14px; cursor: pointer; color: #888; text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+    .tab.active { background: #f0f0ea; color: #1a1a1a; font-weight: 500; border-color: #aaa; }
+    .week-label-big { font-size: 13px; color: #888; margin-bottom: 1rem; font-weight: 500; }
+    .week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .day-card { background: #fff; border: 1px solid #e8e8e2; border-radius: 12px; padding: 0.875rem; }
+    .day-card h3 { font-size: 12px; font-weight: 500; color: #888; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .day-card .trainer { font-size: 12px; color: #aaa; margin-bottom: 2px; }
+    .day-card .total-time { font-size: 11px; color: #aaa; margin-bottom: 8px; }
+    .time-bar-bg { height: 3px; background: #e8e8e2; border-radius: 99px; margin-bottom: 10px; }
+    .time-bar-fill { height: 3px; border-radius: 99px; transition: width 0.3s; }
+    .training-item { background: #f5f5f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; min-height: 56px; display: flex; flex-direction: column; justify-content: center; }
+    .training-item .name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+    .training-item .meta { font-size: 12px; color: #888; margin-top: 3px; }
+    .add-btn { width: 100%; padding: 10px 8px; border: 1px dashed #ccc; border-radius: 8px; background: transparent; color: #aaa; font-size: 13px; cursor: pointer; margin-top: 4px; min-height: 44px; font-family: inherit; }
+    .form-card { background: #fff; border: 1px solid #e8e8e2; border-radius: 12px; padding: 1.125rem; margin-bottom: 1rem; }
+    .form-card h2 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; color: #1a1a1a; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 13px; color: #888; margin-bottom: 5px; }
+    .field input, .field select, .field textarea { width: 100%; border-radius: 8px; font-size: 16px; min-height: 44px; padding: 10px 12px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; font-family: inherit; }
+    .field textarea { height: 90px; resize: vertical; min-height: 90px; font-size: 15px; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #888; }
+    .field input.error { border-color: #e24b4a; }
+    .field .hint { font-size: 12px; color: #e24b4a; margin-top: 4px; display: none; }
+    .field .hint.show { display: block; }
+    .btn-row { display: flex; gap: 8px; margin-top: 1.25rem; flex-wrap: wrap; }
+    .btn-primary { flex: 1; padding: 13px; background: #f0f0ea; border: 1px solid #aaa; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; color: #1a1a1a; min-height: 48px; font-family: inherit; }
+    .btn-secondary { padding: 13px 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: transparent; font-size: 15px; cursor: pointer; color: #888; min-height: 48px; font-family: inherit; }
+    .btn-edit { padding: 13px 16px; border: 1px solid #aaa; border-radius: 8px; background: #f0f0ea; font-size: 15px; cursor: pointer; color: #1a1a1a; min-height: 48px; font-family: inherit; }
+    .btn-danger { padding: 13px 16px; border: 1px solid #e24b4a; border-radius: 8px; background: transparent; font-size: 15px; cursor: pointer; color: #e24b4a; min-height: 48px; font-family: inherit; }
+    .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+    .badge-ma { background: #E6F1FB; color: #0C447C; }
+    .badge-wo { background: #EAF3DE; color: #3B6D11; }
+    .empty { color: #aaa; font-size: 13px; font-style: italic; padding: 8px 0; }
+    .detail-view { background: #fff; border: 1px solid #e8e8e2; border-radius: 12px; padding: 1.125rem; }
+    .detail-section { margin-bottom: 1.25rem; }
+    .detail-section h4 { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .oef-detail-card { background: #f5f5f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; width: 100%; box-sizing: border-box; overflow: hidden; }
+    .oef-detail-card .oef-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .oef-detail-card .oef-title { font-size: 15px; font-weight: 500; color: #1a1a1a; word-break: break-word; }
+    .oef-detail-card .oef-sub { font-size: 12px; color: #888; margin-top: 3px; word-break: break-word; }
+    .oef-detail-card .oef-desc-preview { font-size: 13px; color: #888; line-height: 1.5; white-space: normal; overflow: hidden; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .oef-img-strip { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .oef-img-strip img { width: 100%; height: auto; border-radius: 8px; cursor: pointer; display: block; max-width: 100%; }
+    .yt-thumb { position: relative; cursor: pointer; border-radius: 8px; overflow: hidden; width: 100%; }
+    .yt-thumb img { width: 100%; height: auto; display: block; }
+    .yt-thumb .play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+    .yt-thumb .play svg { width: 48px; height: 48px; }
+    .oef-desc-preview { font-size: 13px; color: #888; line-height: 1.5; margin-top: 4px; white-space: normal; overflow: visible; word-break: break-word; }
+    .oef-view-card { background: #fff; border: 1px solid #e8e8e2; border-radius: 12px; padding: 1.125rem; margin-bottom: 1rem; }
+    .oef-view-meta { font-size: 13px; color: #888; margin-bottom: 1rem; }
+    .oef-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #185FA5; text-decoration: none; margin-bottom: 1rem; min-height: 36px; }
+    .oef-img-grid-large { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .oef-img-grid-large img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .oef-img-grid-large img:only-child { grid-column: span 2; height: 220px; }
+    .img-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .img-grid-item { position: relative; }
+    .img-grid-item img { width: 100%; height: 80px; object-fit: cover; border-radius: 6px; cursor: pointer; }
+    .img-grid-item .del-img { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); border: none; border-radius: 99px; color: white; font-size: 11px; cursor: pointer; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .upload-area { border: 1px dashed #ccc; border-radius: 8px; padding: 1.25rem; text-align: center; cursor: pointer; margin-bottom: 8px; min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+    .upload-area p { font-size: 13px; color: #aaa; }
+    .oef-expand { border: 1px solid #e8e8e2; border-radius: 12px; margin-bottom: 10px; overflow: hidden; transition: opacity 0.15s; }
+    .oef-expand.dragging { opacity: 0.4; }
+    .oef-expand.drag-over { border: 2px solid #639922; }
+    .oef-expand-header { display: flex; align-items: center; gap: 10px; padding: 12px; background: #f5f5f0; cursor: pointer; min-height: 52px; }
+    .oef-expand-header .oef-name { flex: 1; font-size: 14px; font-weight: 500; color: #1a1a1a; }
+    .oef-expand-header .oef-dur-badge { font-size: 12px; color: #888; white-space: nowrap; }
+    .drag-handle { cursor: grab; color: #ccc; font-size: 18px; padding: 0 4px; user-select: none; flex-shrink: 0; }
+    .drag-handle:active { cursor: grabbing; }
+    .detail-meta { font-size: 13px; color: #888; margin-bottom: 1rem; line-height: 1.8; }
+    .del-oef-btn { background: none; border: none; cursor: pointer; color: #aaa; font-size: 20px; padding: 4px 6px; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
+    .sync-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; margin-top: 1.5rem; font-size: 12px; color: #888; }
+    .sync-bar.ok { background: #EAF3DE; color: #3B6D11; }
+    .sync-bar.loading { background: #f0f0ea; }
+    .sync-bar.error { background: #FAECE7; color: #993C1D; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot.green { background: #639922; }
+    .dot.gray { background: #aaa; }
+    .dot.red { background: #e24b4a; }
+    .historie-toggle { width: 100%; padding: 10px 12px; border: 1px solid #e8e8e2; border-radius: 8px; background: #fff; font-size: 13px; cursor: pointer; color: #888; text-align: left; display: flex; align-items: center; justify-content: space-between; min-height: 44px; font-family: inherit; margin-bottom: 4px; }
+    .historie-list { display: none; margin-top: 4px; }
+    .historie-list.open { display: block; }
+    .historie-item { background: #f5f5f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; opacity: 0.75; }
+    .historie-item .name { font-size: 13px; font-weight: 500; color: #1a1a1a; }
+    .historie-item .meta { font-size: 11px; color: #888; margin-top: 2px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 95vw; max-height: 80vh; object-fit: contain; border-radius: 4px; }
+    .lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 22px; width: 44px; height: 44px; border-radius: 99px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .lightbox-nav { display: flex; gap: 12px; margin-top: 16px; }
+    .lightbox-nav button { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 22px; width: 48px; height: 48px; border-radius: 99px; cursor: pointer; font-family: inherit; }
+    .lightbox-counter { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 8px; font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div id="screen-overzicht" class="screen active">
+    <div class="header"><h1>Trainingen</h1></div>
+    <div class="tabs">
+      <div class="tab active" onclick="showMainTab('overzicht')">Weekoverzicht</div>
+      <div class="tab" onclick="showMainTab('nieuw')">Nieuwe training</div>
+      <div class="tab" onclick="showMainTab('bibliotheek')">Bibliotheek</div>
+    </div>
+    <div id="tab-overzicht">
+      <div class="week-label-big" id="week-label"></div>
+      <div class="week-grid">
+        <div class="day-card">
+          <h3>Maandag</h3><div class="trainer">Michel</div>
+          <div class="total-time" id="time-ma"></div>
+          <div class="time-bar-bg"><div class="time-bar-fill" id="bar-ma" style="background:#378ADD;width:0%;"></div></div>
+          <div id="list-ma"></div>
+          <button class="add-btn" onclick="newTraining('Maandag')">+ Toevoegen</button>
+        </div>
+        <div class="day-card">
+          <h3>Woensdag</h3><div class="trainer">Pim</div>
+          <div class="total-time" id="time-wo"></div>
+          <div class="time-bar-bg"><div class="time-bar-fill" id="bar-wo" style="background:#639922;width:0%;"></div></div>
+          <div id="list-wo"></div>
+          <button class="add-btn" onclick="newTraining('Woensdag')">+ Toevoegen</button>
+        </div>
+      </div>
+      <button class="historie-toggle" onclick="toggleHistorie()">
+        <span>Eerdere trainingen</span><span id="historie-arrow">▾</span>
+      </button>
+      <div class="historie-list" id="historie-list"></div>
+      <div id="sync-status" class="sync-bar loading"><div class="dot gray"></div><span>Verbinden met database...</span></div>
+    </div>
+    <div id="tab-bibliotheek" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:1rem;">
+        <input type="text" id="bib-zoek" placeholder="Zoek oefening..." oninput="renderBibliotheek()" style="flex:1;border-radius:8px;font-size:15px;min-height:44px;padding:10px 12px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-family:inherit;" />
+        <select id="bib-cat" onchange="renderBibliotheek()" style="border-radius:8px;font-size:14px;min-height:44px;padding:10px 8px;border:1px solid #ddd;background:#fff;color:#888;font-family:inherit;">
+          <option value="">Alle categorieën</option>
+          <option>Warming-up</option>
+          <option>Passen</option>
+          <option>Schieten / afronden</option>
+          <option>Dribbelen</option>
+          <option>Techniek</option>
+          <option>Positiespel</option>
+          <option>Verdedigen</option>
+          <option>Snelheid</option>
+          <option>Conditie</option>
+          <option>Keepers</option>
+          <option>Partijvorm</option>
+          <option>Spelletjes</option>
+        </select>
+      </div>
+      <div id="bib-list"></div>
+      <button class="add-btn" onclick="openNieuweLibOef()" style="margin-top:8px;">+ Nieuwe oefening toevoegen</button>
+    </div>
+    <div id="tab-nieuw" style="display:none;">
+      <div class="form-card">
+        <h2 id="form-title">Nieuwe training</h2>
+        <div class="field"><label>Naam training</label><input type="text" id="f-naam" placeholder="bijv. Training 24 maart 2026" /></div>
+        <div class="field">
+          <label>Datum</label>
+          <input type="date" id="f-datum" onchange="onDatumChange()" />
+          <div class="hint" id="datum-hint">Datum moet in de toekomst liggen</div>
+        </div>
+        <div class="field"><label>Dag</label>
+          <select id="f-dag" onchange="updateFormTimeHint();updateNaamFromDatum()">
+            <option value="Maandag">Maandag (Michel) — 75 min</option>
+            <option value="Woensdag" selected>Woensdag (Pim) — 90 min</option>
+          </select>
+        </div>
+        <div class="field"><label>Intensiteit</label>
+          <select id="f-int"><option>Laag</option><option selected>Middel</option><option>Hoog</option></select>
+        </div>
+        <div class="field"><label>Notities</label><textarea id="f-notes" placeholder="Extra info, materiaal, aandachtspunten..."></textarea></div>
+        <div class="field">
+          <label>Oefeningen <span id="form-time-hint" style="font-size:12px;font-weight:400;margin-left:6px;color:#aaa;"></span></label>
+          <div id="oef-form-list"></div>
+          <button class="add-btn" style="margin-top:8px;" onclick="openNieuweOef()">+ Oefening toevoegen</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="saveTraining()">Opslaan</button>
+          <button class="btn-secondary" onclick="showMainTab('overzicht')">Annuleren</button>
+          <button class="btn-danger" id="del-btn" style="display:none;" onclick="deleteTraining()">Verwijder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-training" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">← Terug</button>
+      <h1 id="detail-title" style="font-size:16px;"></h1>
+      <button class="btn-secondary" style="font-size:14px;padding:8px 12px;min-height:40px;" onclick="editCurrentTraining()">Bewerk</button>
+    </div>
+    <div class="detail-view">
+      <div class="detail-meta" id="detail-meta"></div>
+      <div class="detail-section" id="detail-notes-section" style="display:none;">
+        <h4>Notities</h4>
+        <p id="detail-notes" style="font-size:14px;color:#888;line-height:1.6;"></p>
+      </div>
+      <div class="detail-section">
+        <h4>Oefeningen</h4>
+        <div id="detail-oef-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-oefening-view" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="terugNaarTraining()">← Terug</button>
+      <h1 id="oef-view-title" style="font-size:16px;"></h1>
+      <button class="btn-edit" style="font-size:14px;padding:8px 12px;min-height:40px;" onclick="switchToEditOef()">Aanpassen</button>
+    </div>
+    <div class="oef-view-card">
+      <div class="oef-view-meta" id="oef-view-meta"></div>
+      <div id="oef-view-desc"></div>
+      <div id="oef-view-link"></div>
+      <div id="oef-view-imgs"></div>
+    </div>
+  </div>
+
+  <div id="screen-oefening-edit" class="screen">
+    <div class="header">
+      <button class="back-btn" id="oef-back-btn" onclick="terugVanuitEdit()">← Terug</button>
+      <h1 id="oef-screen-title" style="font-size:16px;">Oefening</h1>
+    </div>
+    <div class="form-card">
+      <div class="field"><label>Naam oefening</label><input type="text" id="od-naam" placeholder="bijv. Rondo 4v2" autocomplete="off" /></div>
+      <div class="field"><label>Categorie</label>
+        <select id="od-cat">
+          <option value="">-- Kies categorie --</option>
+          <option>Warming-up</option>
+          <option>Passen</option>
+          <option>Schieten / afronden</option>
+          <option>Dribbelen</option>
+          <option>Techniek</option>
+          <option>Positiespel</option>
+          <option>Verdedigen</option>
+          <option>Snelheid</option>
+          <option>Conditie</option>
+          <option>Keepers</option>
+          <option>Partijvorm</option>
+          <option>Spelletjes</option>
+        </select>
+      </div>
+      <div class="field"><label>Duur (minuten)</label><input type="number" inputmode="numeric" id="od-dur" placeholder="bijv. 15" oninput="updateFormTimeHint()" /></div>
+      <div class="field"><label>Beschrijving</label><textarea id="od-desc" placeholder="Doel, uitvoering, coachingspunten..."></textarea></div>
+      <div class="field"><label>Link naar video of website</label><input type="url" id="od-url" placeholder="https://..." inputmode="url" /></div>
+      <div class="field">
+        <label>Afbeeldingen / screenshots</label>
+        <div class="img-grid" id="od-img-grid"></div>
+        <div class="upload-area" onclick="document.getElementById('img-upload').click()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Tik om foto te uploaden</p>
+        </div>
+        <input type="file" id="img-upload" accept="image/*" multiple style="display:none;" onchange="handleImgUpload(event)" />
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveOefening()">Oefening opslaan</button>
+        <button class="btn-secondary" id="oef-cancel-btn" onclick="terugVanuitEdit()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+  <div id="screen-bib-view" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('overzicht');showMainTab('bibliotheek')">← Terug</button>
+      <h1 id="bib-view-title" style="font-size:16px;"></h1>
+      <button class="btn-edit" style="font-size:14px;padding:8px 12px;min-height:40px;" onclick="openEditLibOef(currentLibIdx)">Aanpassen</button>
+    </div>
+    <div class="oef-view-card">
+      <div id="bib-view-meta"></div>
+      <div id="bib-view-desc"></div>
+      <div id="bib-view-link"></div>
+      <div id="bib-view-imgs"></div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:1rem;" onclick="verwijderLibOef(currentLibIdx)">Verwijder uit bibliotheek</button>
+  </div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">✕</button>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  <div class="lightbox-nav" onclick="event.stopPropagation()">
+    <button onclick="lightboxNav(-1)">‹</button>
+    <button onclick="lightboxNav(1)">›</button>
+  </div>
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+</div>
+
+<script>
+// =============================================
+// ALLE STATE EN UI FUNCTIES - geen module, dus
+// direct beschikbaar als onclick handlers
+// =============================================
+
+const MAX_TIJD = { Maandag: 75, Woensdag: 90 };
+const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+
+let trainingen = [];
+let bibliotheek = [];
+let currentLibIdx = -1;
+let libEditMode = false;
+let oefeningen = [], tempImgs = [];
+let editIndex = -1, currentTrainingIdx = -1, currentOefIdx = -1;
+let oefContext = 'training-form'; // 'training-form' of 'detail'
+let historieOpen = false;
+let lightboxImgs = [], lightboxIdx = 0;
+
+// Firebase save/delete worden later ingesteld vanuit het module script
+let _saveToFirebase = async (t) => { console.log('Firebase nog niet klaar'); };
+let _deleteFromFirebase = async (id) => { console.log('Firebase nog niet klaar'); };
+
+// ---- Datum helpers ----
+function getNextWeekBounds() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  // Zoek de eerstvolgende maandag na vandaag
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + 1); // begin bij morgen
+  while (nextMonday.getDay() !== 1) { // 1 = maandag
+    nextMonday.setDate(nextMonday.getDate() + 1);
+  }
+  const nextWoensdag = new Date(nextMonday);
+  nextWoensdag.setDate(nextMonday.getDate() + 2);
+  return { nextMonday, nextWoensdag };
+}
+
+function getWeek(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+  return Math.ceil((((date - new Date(Date.UTC(date.getUTCFullYear(),0,1)))/86400000)+1)/7);
+}
+
+function isVolgendeWeek(datum, dag) {
+  if (!datum) return false;
+  const d = new Date(datum + 'T12:00:00');
+  const { nextMonday, nextWoensdag } = getNextWeekBounds();
+  if (dag === 'Maandag') return d.toDateString() === nextMonday.toDateString();
+  if (dag === 'Woensdag') return d.toDateString() === nextWoensdag.toDateString();
+  return false;
+}
+
+function isInToekomst(datum) {
+  if (!datum) return true;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return new Date(datum + 'T12:00:00') > today;
+}
+
+function formatDatum(datum) {
+  if (!datum) return '';
+  const d = new Date(datum + 'T12:00:00');
+  return `${d.getDate()} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function defaultNaam(datum) {
+  return datum ? `Training ${formatDatum(datum)}` : 'Nieuwe training';
+}
+
+function updateNaamFromDatum() {
+  const datum = document.getElementById('f-datum').value;
+  const naam = document.getElementById('f-naam').value;
+  if (!naam || naam.startsWith('Training ') || naam === 'Nieuwe training') {
+    document.getElementById('f-naam').value = defaultNaam(datum);
+  }
+}
+
+function onDatumChange() {
+  const datum = document.getElementById('f-datum').value;
+  const hint = document.getElementById('datum-hint');
+  document.getElementById('f-datum').classList.remove('error');
+  if (datum && !isInToekomst(datum)) {
+    hint.textContent = 'Datum in het verleden — training verschijnt in de historie';
+    hint.style.color = '#888';
+    hint.classList.add('show');
+  } else {
+    hint.classList.remove('show');
+  }
+  updateNaamFromDatum();
+}
+
+// ---- Lightbox ----
+
+
+
+
+
+
+
+
+// ---- Lightbox ----
+function openLightbox(imgs, idx) {
+  lightboxImgs = Array.isArray(imgs) ? imgs : [];
+  lightboxIdx = idx || 0;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('open');
+}
+function updateLightbox() {
+  document.getElementById('lightbox-img').src = lightboxImgs[lightboxIdx] || '';
+  document.getElementById('lightbox-counter').textContent =
+    lightboxImgs.length > 1 ? `${lightboxIdx+1} / ${lightboxImgs.length}` : '';
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+function lightboxNav(dir) {
+  if (!lightboxImgs.length) return;
+  lightboxIdx = (lightboxIdx + dir + lightboxImgs.length) % lightboxImgs.length;
+  updateLightbox();
+}
+
+// ---- Tijd ----
+function getOefeningenMins() { return oefeningen.reduce((s,o)=>s+(parseInt(o.dur)||0),0); }
+function getTotalMins(dag) {
+  return trainingen.filter(t=>t.dag===dag && isVolgendeWeek(t.datum, dag))
+    .flatMap(t=>t.oefeningen).reduce((s,o)=>s+(parseInt(o.dur)||0),0);
+}
+function updateFormTimeHint() {
+  const dag = document.getElementById('f-dag')?.value||'Woensdag';
+  const max=MAX_TIJD[dag], used=getOefeningenMins();
+  const el=document.getElementById('form-time-hint');
+  if (!el) return;
+  if (!used) { el.textContent=`max ${max} min`; el.style.color='#aaa'; return; }
+  const rest=max-used;
+  if (rest<0) { el.textContent=`${used} min — ${Math.abs(rest)} te lang!`; el.style.color='#BA7517'; }
+  else if (rest===0) { el.textContent=`${used}/${max} min — vol`; el.style.color='#3B6D11'; }
+  else { el.textContent=`${used}/${max} min — nog ${rest} min`; el.style.color='#888'; }
+}
+
+// ---- Scherm navigatie ----
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id==='screen-'+name));
+}
+function showMainTab(tab) {
+  document.getElementById('tab-overzicht').style.display=tab==='overzicht'?'':'none';
+  document.getElementById('tab-nieuw').style.display=tab==='nieuw'?'':'none';
+  document.getElementById('tab-bibliotheek').style.display=tab==='bibliotheek'?'':'none';
+  document.querySelectorAll('.tab').forEach(t => {
+    const onclick = t.getAttribute('onclick') || '';
+    t.classList.toggle('active', onclick.includes("'"+tab+"'"));
+  });
+  if (tab==='overzicht') renderOverzicht();
+  if (tab==='nieuw') updateFormTimeHint();
+  if (tab==='bibliotheek') renderBibliotheek();
+}
+function goBack() { showScreen('overzicht'); renderOverzicht(); }
+
+// ---- Bibliotheek ----
+function renderBibliotheek() {
+  const el = document.getElementById('bib-list');
+  if (!el) return;
+  const zoek = (document.getElementById('bib-zoek')?.value||'').toLowerCase();
+  const cat = document.getElementById('bib-cat')?.value||'';
+  let items = bibliotheek;
+  if (zoek) items = items.filter(o=>o.naam.toLowerCase().includes(zoek)||(o.desc||'').toLowerCase().includes(zoek));
+  if (cat) items = items.filter(o=>o.cat===cat);
+  if (!items.length) { el.innerHTML='<div class="empty" style="padding:1rem 0;">Nog geen oefeningen in de bibliotheek</div>'; return; }
+  el.innerHTML = items.map(o => {
+    const idx = bibliotheek.indexOf(o);
+    const catBadge = o.cat ? `<span style="font-size:11px;color:#3B6D11;background:#EAF3DE;padding:2px 6px;border-radius:99px;">${o.cat}</span>` : '';
+    const thumb = o.imgs&&o.imgs[0] ? `<img src="${o.imgs[0]}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;">` : '';
+    return `<div class="oef-detail-card" onclick="openLibOefView(${idx})">
+      <div class="oef-row">${thumb}<div style="flex:1;">
+        <div class="oef-title">${o.naam}</div>
+        <div class="oef-sub" style="margin-top:3px;">${o.dur} min ${catBadge}</div>
+        ${o.desc?`<div class="oef-desc-preview" style="margin-top:4px;">${o.desc}</div>`:''}
+      </div></div>
+    </div>`;
+  }).join('');
+}
+
+function openLibOefView(idx) {
+  currentLibIdx = idx;
+  const o = bibliotheek[idx];
+  document.getElementById('bib-view-title').textContent = o.naam;
+  const lbl = t=>`<span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;">${t}</span>`;
+  const val = (v,ph)=>`<div style="font-size:15px;color:${v?'#1a1a1a':'#bbb'};margin-top:2px;">${v||ph}</div>`;
+  let html = '';
+  html += `<div style="margin-bottom:12px;">${lbl('Categorie')}${val(o.cat,'Geen categorie')}</div>`;
+  html += `<div style="margin-bottom:12px;">${lbl('Duur')}${val(o.dur?o.dur+' minuten':'','Niet ingevuld')}</div>`;
+  html += `<div style="margin-bottom:12px;">${lbl('Omschrijving')}<div style="font-size:15px;color:${o.desc?'#333':'#bbb'};line-height:1.7;margin-top:4px;word-break:break-word;white-space:pre-wrap;">${o.desc||'Geen omschrijving'}</div></div>`;
+  document.getElementById('bib-view-meta').innerHTML = html;
+  const ytId = getYouTubeId(o.url);
+  if (ytId) {
+    document.getElementById('bib-view-link').innerHTML=`<div style="margin-bottom:12px;">${lbl('Video')}<div style="margin-top:6px;background:#FF0000;border-radius:8px;display:flex;align-items:center;justify-content:center;min-height:80px;cursor:pointer;" onclick="window.open('${o.url}','_blank')"><svg viewBox="0 0 90 20" width="90" height="20" fill="white"><path d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C2.24288e-07 5.35042 0 10 0 10C0 10 2.24288e-07 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324ZM11.4253 14.2854V5.71461L18.8477 10.0013L11.4253 14.2854Z"/></svg><span style="color:white;font-size:14px;margin-left:8px;font-family:inherit;">Bekijk op YouTube</span></div></div>`;
+  } else if (o.url) {
+    document.getElementById('bib-view-link').innerHTML=`<div style="margin-bottom:12px;">${lbl('Link')}<div style="margin-top:4px;"><a href="${o.url}" class="oef-link" target="_blank">Bekijk video / website</a></div></div>`;
+  } else { document.getElementById('bib-view-link').innerHTML=''; }
+  const imgs=o.imgs&&o.imgs.length?o.imgs:[];
+  document.getElementById('bib-view-imgs').innerHTML=imgs.length?`<div style="margin-bottom:12px;"><div class="oef-img-grid-large">${imgs.map((src,si)=>`<img src="${src}" onclick="openLightbox(bibliotheek[${idx}].imgs,${si})" />`).join('')}</div></div>`:'';
+  showScreen('bib-view');
+}
+
+function openNieuweLibOef() {
+  libEditMode = false; currentLibIdx = -1;
+  oefContext = 'bibliotheek';
+  loadOefeningForm(null, 'Nieuwe bibliotheek oefening');
+  document.getElementById('oef-back-btn').onclick=()=>{ showScreen('overzicht'); showMainTab('bibliotheek'); };
+  document.getElementById('oef-cancel-btn').onclick=()=>{ showScreen('overzicht'); showMainTab('bibliotheek'); };
+  showScreen('oefening-edit');
+}
+
+function openEditLibOef(idx) {
+  libEditMode = true; currentLibIdx = idx;
+  oefContext = 'bibliotheek';
+  loadOefeningForm(bibliotheek[idx], 'Oefening bewerken');
+  document.getElementById('oef-back-btn').onclick=()=>openLibOefView(idx);
+  document.getElementById('oef-cancel-btn').onclick=()=>openLibOefView(idx);
+  showScreen('oefening-edit');
+}
+
+async function verwijderLibOef(idx) {
+  if (!confirm('Oefening verwijderen uit bibliotheek?')) return;
+  await window._deleteLibFromFirebase(bibliotheek[idx].id);
+  showScreen('overzicht'); showMainTab('bibliotheek');
+}
+function terugVanuitEdit() {
+  if (oefContext === 'detail') {
+    openOefeningView(currentOefIdx);
+  } else {
+    showScreen('overzicht'); showMainTab('nieuw');
+  }
+}
+
+function toggleHistorie() {
+  historieOpen=!historieOpen;
+  document.getElementById('historie-list').classList.toggle('open',historieOpen);
+  document.getElementById('historie-arrow').textContent=historieOpen?'▴':'▾';
+  if (historieOpen) renderHistorie();
+}
+
+// ---- Render ----
+function setSyncStatus(state, msg) {
+  const el=document.getElementById('sync-status');
+  if (!el) return;
+  el.className='sync-bar '+state;
+  const dot=state==='ok'?'green':state==='error'?'red':'gray';
+  el.innerHTML=`<div class="dot ${dot}"></div><span>${msg}</span>`;
+}
+
+function renderHistorie() {
+  const el=document.getElementById('historie-list');
+  const oud=trainingen
+    .filter(t=>!isVolgendeWeek(t.datum, t.dag))
+    .sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
+  if (!oud.length) { el.innerHTML='<div class="empty" style="padding:8px;">Geen eerdere trainingen</div>'; return; }
+  el.innerHTML=oud.map(t=>{
+    const idx=trainingen.indexOf(t);
+    const mins=t.oefeningen.reduce((s,o)=>s+(parseInt(o.dur)||0),0);
+    return `<div class="historie-item" onclick="openTraining(${idx})">
+      <div class="name">${t.naam}</div>
+      <div class="meta"><span class="badge ${t.dag==='Maandag'?'badge-ma':'badge-wo'}">${t.dag}</span>&nbsp;${t.datum?formatDatum(t.datum):''} &middot; ${mins} min</div>
+    </div>`;
+  }).join('');
+}
+
+function renderOverzicht() {
+  const { nextMonday, nextWoensdag }=getNextWeekBounds();
+  document.getElementById('week-label').textContent=
+    `Week ${getWeek(nextMonday)} — ma ${nextMonday.getDate()} ${MAANDEN[nextMonday.getMonth()]} & wo ${nextWoensdag.getDate()} ${MAANDEN[nextWoensdag.getMonth()]}`;
+  ['Maandag','Woensdag'].forEach(dag=>{
+    const sfx=dag==='Maandag'?'ma':'wo';
+    const items=trainingen.filter(t=>t.dag===dag && isVolgendeWeek(t.datum, dag));
+    const used=getTotalMins(dag), max=MAX_TIJD[dag], pct=Math.min(100,Math.round(used/max*100));
+    const timeEl=document.getElementById('time-'+sfx), barEl=document.getElementById('bar-'+sfx);
+    barEl.style.width=pct+'%';
+    if (used>max) { timeEl.textContent=`${used}/${max} min — ${used-max} te lang`; timeEl.style.color='#BA7517'; barEl.style.background='#BA7517'; }
+    else if (used===0) { timeEl.textContent=`0/${max} min`; timeEl.style.color='#aaa'; }
+    else { timeEl.textContent=`${used}/${max} min`; timeEl.style.color='#aaa'; barEl.style.background=dag==='Maandag'?'#378ADD':'#639922'; }
+    const el=document.getElementById('list-'+sfx);
+    if (!items.length) { el.innerHTML='<div class="empty">Nog geen training gepland</div>'; return; }
+    el.innerHTML=items.map(t=>{
+      const idx=trainingen.indexOf(t);
+      const mins=t.oefeningen.reduce((s,o)=>s+(parseInt(o.dur)||0),0);
+      const oefPreview = t.oefeningen.length
+        ? t.oefeningen.map(o=>{
+            const cat = o.cat ? `<span style="font-size:10px;color:#3B6D11;background:#EAF3DE;padding:1px 5px;border-radius:99px;margin-left:3px;">${o.cat}</span>` : '';
+            return `<div style="display:flex;align-items:center;padding:4px 0;border-top:1px solid #e8e8e2;gap:6px;">
+              <span style="font-size:12px;color:#1a1a1a;flex:1;">${o.naam}</span>
+              ${cat}
+              <span style="font-size:11px;color:#aaa;flex-shrink:0;">${o.dur} min</span>
+            </div>`;
+          }).join('')
+        : '';
+      return `<div class="training-item" onclick="openTraining(${idx})">
+        <div class="name">${t.naam}</div>
+        <div class="meta">${t.oefeningen.length} oef. &middot; ${mins} min &middot; ${t.intensiteit}</div>
+        ${oefPreview ? `<div style="margin-top:6px;">${oefPreview}</div>` : ''}
+      </div>`;
+    }).join('');
+  });
+  if (historieOpen) renderHistorie();
+}
+
+function openTraining(idx) {
+  currentTrainingIdx=idx;
+  const t=trainingen[idx];
+  const mins=t.oefeningen.reduce((s,o)=>s+(parseInt(o.dur)||0),0);
+  document.getElementById('detail-title').textContent=t.naam;
+  document.getElementById('detail-meta').innerHTML=
+    `<span class="badge ${t.dag==='Maandag'?'badge-ma':'badge-wo'}">${t.dag}</span>${t.datum?' &nbsp;'+formatDatum(t.datum):''} &nbsp;&middot;&nbsp; ${t.intensiteit} &nbsp;&middot;&nbsp; ${mins}/${MAX_TIJD[t.dag]} min`;
+  const ns=document.getElementById('detail-notes-section');
+  if (t.notes) { ns.style.display=''; document.getElementById('detail-notes').textContent=t.notes; } else ns.style.display='none';
+  renderDetailOef(t);
+  showScreen('training');
+}
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function renderDetailOef(t) {
+  const el=document.getElementById('detail-oef-list');
+  if (!t.oefeningen.length) { el.innerHTML='<div class="empty">Geen oefeningen</div>'; return; }
+  el.innerHTML=t.oefeningen.map((o,i)=>{
+    const imgs=o.imgs&&o.imgs.length?o.imgs:[];
+    const ytId = getYouTubeId(o.url);
+    const ytThumb = ytId ? `<div class="yt-thumb" onclick="event.stopPropagation();window.open('${o.url}','_blank')" style="background:#FF0000;display:flex;align-items:center;justify-content:center;min-height:80px;"><svg viewBox="0 0 90 20" width="90" height="20" fill="white"><path d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C2.24288e-07 5.35042 0 10 0 10C0 10 2.24288e-07 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324ZM11.4253 14.2854V5.71461L18.8477 10.0013L11.4253 14.2854Z"/></svg><span style="color:white;font-size:12px;margin-left:8px;font-family:inherit;">YouTube</span></div>` : '';
+    const imgItems = imgs.map((src,si)=>`<img src="${src}" onclick="event.stopPropagation();openLightboxForOef(${currentTrainingIdx},${i},${si})" />`).join('');
+    const strip = (imgs.length || ytThumb) ? `<div class="oef-img-strip">${ytThumb}${imgItems}</div>` : '';
+    const catBadge = o.cat ? `<span style="font-size:11px;background:#e8f0e8;color:#3B6D11;padding:2px 8px;border-radius:99px;margin-left:6px;">${o.cat}</span>` : '';
+    const prev = o.desc ? `<div class="oef-desc-preview" style="margin-top:6px;margin-bottom:4px;">${o.desc}</div>` : '';
+    return `<div class="oef-detail-card" onclick="openOefeningView(${i})">
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;margin-bottom:4px;">
+        <div class="oef-title">${o.naam}</div>${catBadge}
+      </div>
+      <div class="oef-sub" style="margin-bottom:4px;">${o.dur} min${o.url&&!ytId?' &middot; link':''}</div>
+      ${prev}
+      ${strip}
+    </div>`;
+  }).join('');
+}
+
+function openLightboxForOef(tIdx, oefIdx, imgIdx) {
+  const o=trainingen[tIdx]?.oefeningen?.[oefIdx];
+  if (o) openLightbox(o.imgs||[], imgIdx);
+}
+
+// ---- Oefening view mode ----
+function openOefeningView(oefIdx) {
+  currentOefIdx=oefIdx;
+  const o=trainingen[currentTrainingIdx].oefeningen[oefIdx];
+  document.getElementById('oef-view-title').textContent=o.naam;
+  const ytId = getYouTubeId(o.url);
+  const lbl = (t) => `<span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;">${t}</span>`;
+  const val = (v, placeholder) => `<div style="font-size:15px;color:${v?'#1a1a1a':'#bbb'};margin-top:2px;">${v||placeholder}</div>`;
+  let html = '';
+  html += `<div style="margin-bottom:12px;">${lbl('Categorie')}${val(o.cat,'Geen categorie')}</div>`;
+  html += `<div style="margin-bottom:12px;">${lbl('Duur')}${val(o.dur?o.dur+' minuten':'','Niet ingevuld')}</div>`;
+  html += `<div style="margin-bottom:12px;">${lbl('Omschrijving')}<div style="font-size:15px;color:${o.desc?'#333':'#bbb'};line-height:1.7;margin-top:4px;word-break:break-word;white-space:pre-wrap;">${o.desc||'Geen omschrijving'}</div></div>`;
+  document.getElementById('oef-view-meta').innerHTML = html;
+  document.getElementById('oef-view-desc').innerHTML = '';
+  if (ytId) {
+    document.getElementById('oef-view-link').innerHTML=`<div style="margin-bottom:12px;"><span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;">Video</span><div style="margin-top:6px;background:#FF0000;border-radius:8px;display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;" onclick="window.open('${o.url}','_blank')"><svg viewBox="0 0 90 20" width="120" height="27" fill="white"><path d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C2.24288e-07 5.35042 0 10 0 10C0 10 2.24288e-07 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324ZM11.4253 14.2854V5.71461L18.8477 10.0013L11.4253 14.2854Z"/></svg><span style="color:white;font-size:16px;margin-left:10px;font-family:inherit;">Bekijk op YouTube</span></div></div>`;
+  } else if (o.url) {
+    document.getElementById('oef-view-link').innerHTML=`<div style="margin-bottom:12px;"><span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;">Link</span><div style="margin-top:4px;"><a href="${o.url}" class="oef-link" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Bekijk video / website</a></div></div>`;
+  } else {
+    document.getElementById('oef-view-link').innerHTML='';
+  }
+  const imgs=o.imgs&&o.imgs.length?o.imgs:[];
+  if (imgs.length) {
+    document.getElementById('oef-view-imgs').innerHTML=`<div style="margin-bottom:12px;"><span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.05em;">Afbeeldingen</span><div class="oef-img-grid-large" style="margin-top:6px;">${imgs.map((src,si)=>`<img src="${src}" onclick="openLightboxForOef(${currentTrainingIdx},${oefIdx},${si})" />`).join('')}</div></div>`;
+  } else {
+    document.getElementById('oef-view-imgs').innerHTML='';
+  }
+  showScreen('oefening-view');
+}
+
+function terugNaarTraining() {
+  showScreen('training'); openTraining(currentTrainingIdx);
+}
+
+function switchToEditOef() {
+  oefContext='detail';
+  const o=trainingen[currentTrainingIdx].oefeningen[currentOefIdx];
+  loadOefeningForm(o,'Oefening aanpassen');
+  showScreen('oefening-edit');
+}
+
+// ---- Oefening edit ----
+function openNieuweOef() {
+  oefContext='training-form'; currentOefIdx=-1;
+  loadOefeningForm(null,'Nieuwe oefening');
+  showScreen('oefening-edit');
+}
+
+function openEditOefeningFromForm(idx) {
+  oefContext='training-form'; currentOefIdx=idx;
+  loadOefeningForm(oefeningen[idx],'Oefening aanpassen');
+  showScreen('oefening-edit');
+}
+
+function loadOefeningForm(o,title) {
+  document.getElementById('oef-screen-title').textContent=title;
+  document.getElementById('od-naam').value=o?o.naam:'';
+  document.getElementById('od-cat').value=o?(o.cat||''):'';
+  document.getElementById('od-dur').value=o?o.dur:'';
+  document.getElementById('od-desc').value=o?(o.desc||''):'';
+  document.getElementById('od-url').value=o?(o.url||''):'';
+  tempImgs=o&&o.imgs?[...o.imgs]:[];
+  renderTempImgs();
+}
+
+function renderTempImgs() {
+  const grid=document.getElementById('od-img-grid');
+  if (!tempImgs.length) { grid.innerHTML=''; return; }
+  grid.innerHTML=tempImgs.map((src,i)=>`<div class="img-grid-item"><img src="${src}" onclick="openLightbox(tempImgs,${i})" /><button class="del-img" onclick="removeImg(${i})">x</button></div>`).join('');
+}
+
+function removeImg(i) { tempImgs.splice(i,1); renderTempImgs(); }
+
+function compressImg(file, callback) {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = function() {
+    const MAX = 800;
+    let w = img.width, h = img.height;
+    if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    // Probeer kwaliteit 0.7, als te groot dan verder comprimeren
+    let result = canvas.toDataURL('image/jpeg', 0.7);
+    let kb = Math.round(result.length * 0.75 / 1024);
+    if (kb > 200) result = canvas.toDataURL('image/jpeg', 0.5);
+    kb = Math.round(result.length * 0.75 / 1024);
+    if (kb > 200) result = canvas.toDataURL('image/jpeg', 0.3);
+    console.log('Afbeelding na compressie: ' + Math.round(result.length * 0.75 / 1024) + ' KB');
+    URL.revokeObjectURL(url);
+    callback(result);
+  };
+  img.src = url;
+}
+
+function handleImgUpload(e) {
+  Array.from(e.target.files).forEach(file=>{
+    compressImg(file, compressed => {
+      tempImgs.push(compressed);
+      renderTempImgs();
+    });
+  });
+  e.target.value='';
+}
+
+function saveOefening() {
+  const naam=document.getElementById('od-naam').value.trim();
+  if (!naam) { alert('Vul een naam in'); return; }
+  const o={ naam, cat:document.getElementById('od-cat').value, dur:document.getElementById('od-dur').value.trim()||'?', desc:document.getElementById('od-desc').value.trim(), url:document.getElementById('od-url').value.trim(), imgs:[...tempImgs] };
+
+  // Bibliotheek modus
+  if (oefContext === 'bibliotheek') {
+    if (libEditMode && currentLibIdx >= 0) o.id = bibliotheek[currentLibIdx].id;
+    window._saveLibToFirebase(o).then(() => {
+      libEditMode = false;
+      oefContext = 'training-form';
+      showScreen('overzicht'); showMainTab('bibliotheek');
+    }).catch(err => alert('Opslaan mislukt: ' + err.message));
+    return;
+  }
+
+  if (oefContext==='detail') {
+    trainingen[currentTrainingIdx].oefeningen[currentOefIdx]=o;
+    window._saveToFirebase(trainingen[currentTrainingIdx]);
+    openOefeningView(currentOefIdx);
+  } else {
+    if(currentOefIdx>=0) oefeningen[currentOefIdx]=o; else oefeningen.push(o);
+    renderOefFormList(); showScreen('overzicht'); showMainTab('nieuw');
+  }
+}
+
+function renderOefFormList() {
+  const el=document.getElementById('oef-form-list');
+  if (!oefeningen.length) { el.innerHTML=''; updateFormTimeHint(); return; }
+  el.innerHTML=oefeningen.map((o,i)=>{
+    const thumb=o.imgs&&o.imgs[0]?`<img src="${o.imgs[0]}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0;">` :'';
+    const icons=[o.desc?'T':'',o.url?'L':'',o.imgs&&o.imgs.length?'F':''].filter(Boolean).join(' ');
+    const cat=o.cat?`<span style="font-size:11px;color:#3B6D11;background:#EAF3DE;padding:2px 6px;border-radius:99px;">${o.cat}</span>`:'';
+    return `<div class="oef-expand" draggable="true" data-idx="${i}">
+      <div class="oef-expand-header">
+        <span class="drag-handle" onclick="event.stopPropagation()">⠿</span>
+        ${thumb}
+        <span class="oef-name" onclick="openEditOefeningFromForm(${i})">${o.naam}</span>
+        ${cat}
+        <span class="oef-dur-badge">${o.dur} min</span>
+        <span style="font-size:11px;color:#aaa;">${icons}</span>
+        <button onclick="event.stopPropagation();removeOefFromForm(${i})" class="del-oef-btn">×</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateFormTimeHint();
+  initDragDrop();
+}
+
+let dragSrcIdx = -1;
+let touchDragEl = null;
+let touchDragIdx = -1;
+
+function initDragDrop() {
+  const items = document.querySelectorAll('#oef-form-list .oef-expand');
+  items.forEach(item => {
+    // Desktop drag & drop
+    item.addEventListener('dragstart', e => {
+      dragSrcIdx = parseInt(item.dataset.idx);
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      document.querySelectorAll('#oef-form-list .oef-expand').forEach(i => i.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      document.querySelectorAll('#oef-form-list .oef-expand').forEach(i => i.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      const targetIdx = parseInt(item.dataset.idx);
+      if (dragSrcIdx !== -1 && dragSrcIdx !== targetIdx) {
+        const moved = oefeningen.splice(dragSrcIdx, 1)[0];
+        oefeningen.splice(targetIdx, 0, moved);
+        renderOefFormList();
+      }
+    });
+
+    // Touch drag & drop voor mobiel
+    const handle = item.querySelector('.drag-handle');
+    if (handle) {
+      handle.addEventListener('touchstart', e => {
+        touchDragIdx = parseInt(item.dataset.idx);
+        touchDragEl = item;
+        item.classList.add('dragging');
+      }, { passive: true });
+
+      handle.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const target = el ? el.closest('.oef-expand') : null;
+        document.querySelectorAll('#oef-form-list .oef-expand').forEach(i => i.classList.remove('drag-over'));
+        if (target && target !== touchDragEl) target.classList.add('drag-over');
+      }, { passive: false });
+
+      handle.addEventListener('touchend', e => {
+        const touch = e.changedTouches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const target = el ? el.closest('.oef-expand') : null;
+        if (target && target !== touchDragEl) {
+          const targetIdx = parseInt(target.dataset.idx);
+          if (touchDragIdx !== -1 && touchDragIdx !== targetIdx) {
+            const moved = oefeningen.splice(touchDragIdx, 1)[0];
+            oefeningen.splice(targetIdx, 0, moved);
+            renderOefFormList();
+          }
+        } else {
+          document.querySelectorAll('#oef-form-list .oef-expand').forEach(i => i.classList.remove('drag-over', 'dragging'));
+        }
+        touchDragEl = null; touchDragIdx = -1;
+      }, { passive: true });
+    }
+  });
+}
+
+function removeOefFromForm(i) { oefeningen.splice(i,1); renderOefFormList(); }
+
+function newTraining(dag) {
+  editIndex=-1; oefeningen=[];
+  const { nextMonday, nextWoensdag }=getNextWeekBounds();
+  const targetDate=dag==='Maandag'?nextMonday:nextWoensdag;
+  // Gebruik lokale datum ipv UTC om timezone problemen te vermijden
+  const y=targetDate.getFullYear();
+  const m=String(targetDate.getMonth()+1).padStart(2,'0');
+  const d=String(targetDate.getDate()).padStart(2,'0');
+  const datumStr=`${y}-${m}-${d}`;
+  document.getElementById('f-naam').value=defaultNaam(datumStr);
+  document.getElementById('f-datum').value=datumStr;
+  document.getElementById('f-dag').value=dag||'Woensdag';
+  document.getElementById('f-int').value='Middel';
+  document.getElementById('f-notes').value='';
+  document.getElementById('form-title').textContent='Nieuwe training';
+  document.getElementById('del-btn').style.display='none';
+  document.getElementById('datum-hint').classList.remove('show');
+  document.getElementById('f-datum').classList.remove('error');
+  renderOefFormList(); showMainTab('nieuw');
+}
+
+function editCurrentTraining() {
+  editIndex=currentTrainingIdx;
+  const t=trainingen[editIndex];
+  oefeningen=t.oefeningen.map(o=>({...o,imgs:o.imgs?[...o.imgs]:[]}));
+  document.getElementById('f-naam').value=t.naam;
+  document.getElementById('f-datum').value=t.datum||'';
+  document.getElementById('f-dag').value=t.dag;
+  document.getElementById('f-int').value=t.intensiteit;
+  document.getElementById('f-notes').value=t.notes||'';
+  document.getElementById('form-title').textContent='Training bewerken';
+  document.getElementById('del-btn').style.display='';
+  document.getElementById('datum-hint').classList.remove('show');
+  document.getElementById('f-datum').classList.remove('error');
+  renderOefFormList(); showScreen('overzicht'); showMainTab('nieuw');
+}
+
+async function saveTraining() {
+  const naam=document.getElementById('f-naam').value.trim();
+  const datum=document.getElementById('f-datum').value;
+  if (!naam) { alert('Vul een naam in'); return; }
+  const t={ naam, dag:document.getElementById('f-dag').value, datum, intensiteit:document.getElementById('f-int').value, notes:document.getElementById('f-notes').value, oefeningen:[...oefeningen] };
+  if (editIndex>=0) t.id=trainingen[editIndex].id;
+  try {
+    setSyncStatus('loading', 'Opslaan...');
+    await window._saveToFirebase(t);
+    showMainTab('overzicht');
+  } catch(err) {
+    alert('Opslaan mislukt: ' + (err.code || err.message || String(err)));
+  }
+}
+
+async function deleteTraining() {
+  if (!confirm('Training verwijderen?')) return;
+  await window._deleteFromFirebase(trainingen[editIndex].id);
+  editIndex=-1; showMainTab('overzicht');
+}
+
+// Render alvast zonder data
+window.renderOverzicht = renderOverzicht;
+window.setSyncStatus = setSyncStatus;
+window.renderBibliotheek = renderBibliotheek;
+window.openLibOefView = openLibOefView;
+window.openNieuweLibOef = openNieuweLibOef;
+window.openEditLibOef = openEditLibOef;
+window.verwijderLibOef = verwijderLibOef;
+window.renderOverzicht();
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDjTY6XFpfGdBt-8Iz7M1qWT44rys7uWi4",
+  authDomain: "app-voor-voetbaltrainingen.firebaseapp.com",
+  projectId: "app-voor-voetbaltrainingen",
+  storageBucket: "app-voor-voetbaltrainingen.firebasestorage.app",
+  messagingSenderId: "869029037781",
+  appId: "1:869029037781:web:84f134fcdc051f2567445c"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+async function laadTrainingen() {
+  try {
+    const snap = await db.collection('trainingen').get();
+    trainingen = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setSyncStatus('ok', 'Verbonden — ' + new Date().toLocaleTimeString('nl-NL', {hour:'2-digit',minute:'2-digit'}));
+    renderOverzicht();
+  } catch(err) {
+    setSyncStatus('error', 'Fout: ' + (err.code || err.message || String(err)));
+  }
+}
+
+window._saveToFirebase = async function(t) {
+  const id = t.id || crypto.randomUUID();
+  const oefeningen = (t.oefeningen || []).map(o => ({
+    naam: o.naam || '',
+    dur: o.dur || '?',
+    desc: o.desc || '',
+    url: o.url || '',
+    imgs: (o.imgs || []).filter(img => typeof img === 'string' && img.length > 0)
+  }));
+  const data = {
+    naam: t.naam || '',
+    dag: t.dag || 'Woensdag',
+    datum: t.datum || '',
+    intensiteit: t.intensiteit || 'Middel',
+    notes: t.notes || '',
+    oefeningen: oefeningen
+  };
+  const dataStr = JSON.stringify(data);
+  const kb = Math.round(dataStr.length * 0.75 / 1024);
+  console.log('Totale data voor opslaan: ' + kb + ' KB');
+  if (kb > 900) {
+    throw new Error('Document te groot (' + kb + ' KB). Gebruik kleinere afbeeldingen.');
+  }
+  await db.collection('trainingen').doc(id).set(data);
+  await laadTrainingen();
+  return id;
+};
+
+window._deleteFromFirebase = async function(id) {
+  await db.collection('trainingen').doc(id).delete();
+  await laadTrainingen();
+};
+
+async function laadBibliotheek() {
+  try {
+    const snap = await db.collection('bibliotheek').get();
+    bibliotheek = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderBibliotheek();
+  } catch(err) {
+    console.log('Bibliotheek fout:', err.message);
+  }
+}
+
+window._saveLibToFirebase = async function(o) {
+  const id = o.id || crypto.randomUUID();
+  const data = {
+    naam: o.naam || '',
+    cat: o.cat || '',
+    dur: o.dur || '?',
+    desc: o.desc || '',
+    url: o.url || '',
+    imgs: (o.imgs || []).filter(img => typeof img === 'string' && img.length > 0)
+  };
+  const dataStr = JSON.stringify(data);
+  const kb = Math.round(dataStr.length * 0.75 / 1024);
+  if (kb > 900) throw new Error('Afbeeldingen te groot (' + kb + ' KB)');
+  await db.collection('bibliotheek').doc(id).set(data);
+  await laadBibliotheek();
+  return id;
+};
+
+window._deleteLibFromFirebase = async function(id) {
+  await db.collection('bibliotheek').doc(id).delete();
+  await laadBibliotheek();
+};
+laadBibliotheek();
+setInterval(laadTrainingen, 30000);
+setInterval(laadBibliotheek, 30000);
+</script>
+
+</body>
+</html>
