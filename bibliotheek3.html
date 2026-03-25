@@ -759,8 +759,24 @@ function renderOverzicht() {
     el.innerHTML=items.map(t=>{
       const idx=trainingen.indexOf(t);
       const mins=t.oefeningen.reduce((s,o)=>s+(parseInt(o.dur)||0),0);
-      const aantalAanwezig = t.aanwezig ? t.aanwezig.length : SPEELSTERS.length;
-      const aanwezigBadge = `<span style="font-size:11px;background:#E6F1FB;color:#0C447C;padding:2px 7px;border-radius:99px;">👥 ${aantalAanwezig}</span>`;
+      const aanwezig = t.aanwezig || SPEELSTERS;
+const afwezig = SPEELSTERS.filter(s => !aanwezig.includes(s));
+
+const aanwezigBadge = `
+  <span style="font-size:11px;background:#E6F1FB;color:#0C447C;padding:2px 7px;border-radius:99px;">
+    👥 ${aanwezig.length}
+  </span>
+  ${afwezig.length ? `
+    <span style="font-size:11px;background:#FAEAEA;color:#A01214;padding:2px 7px;border-radius:99px;">
+      ❌ ${afwezig.length}
+    </span>` : ''}
+`;
+
+const afwezigNamen = afwezig.length
+  ? `<div style="font-size:11px;color:#A01214;margin-top:4px;">
+       Afwezig: ${afwezig.join(', ')}
+     </div>`
+  : '';
       const oefPreview = t.oefeningen.length
         ? t.oefeningen.map(o=>{
             const cat = o.cat ? `<span style="font-size:10px;color:#3B6D11;background:#EAF3DE;padding:1px 5px;border-radius:99px;margin-left:3px;">${o.cat}</span>` : '';
@@ -777,7 +793,8 @@ function renderOverzicht() {
           ${aanwezigBadge}
         </div>
         <div class="meta">${t.oefeningen.length} oef. &middot; ${mins} min &middot; ${t.intensiteit}</div>
-        ${oefPreview ? `<div style="margin-top:6px;">${oefPreview}</div>` : ''}
+${afwezigNamen}
+${oefPreview ? `<div style="margin-top:6px;">${oefPreview}</div>` : ''}
       </div>`;
     }).join('');
   });
