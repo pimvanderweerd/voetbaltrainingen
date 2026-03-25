@@ -7,22 +7,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --rood: #CC1719;
-      --rood-donker: #a01214;
-      --rood-licht: #faeaea;
-      --wit: #ffffff;
-      --grijs-bg: #f6f3f3;
-      --grijs-rand: #e8e0e0;
-      --tekst: #1a0f0f;
-      --tekst-zacht: #7a6060;
-      --tekst-stil: #b8a8a8;
-    }
+:root {
+  --rood: #E31E24;          /* helderder Candia rood */
+  --rood-donker: #B71C1C;   /* diep rood */
+  --rood-licht: #FDECEC;    /* zachte achtergrond */
+  --wit: #ffffff;
+  --grijs-bg: #f7f7f7;
+  --grijs-rand: #e8e0e0;
+  --tekst: #1a0f0f;
+  --tekst-zacht: #6b5c5c;
+  }    
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--grijs-bg); min-height: 100vh; padding: 0; }
 
     /* ---- App header ---- */
-    .app-topbar { background: var(--rood); display: flex; align-items: center; gap: 10px; padding: 10px 16px; box-shadow: 0 2px 8px rgba(160,18,20,0.3); position: sticky; top: 0; z-index: 100; }
+    .app-topbar {
+  background: linear-gradient(135deg, var(--rood) 0%, var(--rood-donker) 100%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
     .app-topbar-logo { width: 36px; height: 36px; flex-shrink: 0; }
     .app-topbar-name { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.1; }
     .app-topbar-sub { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; }
