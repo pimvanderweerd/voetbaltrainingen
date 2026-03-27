@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korfbalvereniging Arena – Rhenen</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a6fb5;
+    --blue-dark: #0f4a80;
+    --red: #d0222a;
+    --black: #111;
+    --grey: #f5f5f5;
+    --text: #222;
+    --white: #fff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 64px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 3px solid var(--red);
+    box-shadow: 0 2px 20px rgba(0,0,0,.08);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: .6rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 1.4rem; letter-spacing: .04em;
+    text-decoration: none; color: var(--black);
+  }
+  .nav-logo span { color: var(--blue); }
+
+  .nav-oval {
+    display: flex; flex-direction: column; align-items: center;
+    width: 44px; height: 44px; position: relative;
+  }
+  .nav-oval svg { width: 44px; height: 44px; }
+
+  nav ul {
+    display: flex; gap: 0; list-style: none;
+  }
+  nav ul li a {
+    display: block; padding: .4rem 1rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; font-size: .95rem; letter-spacing: .06em;
+    text-transform: uppercase; text-decoration: none; color: var(--black);
+    position: relative; transition: color .2s;
+  }
+  nav ul li a::after {
+    content: ''; position: absolute; bottom: 0; left: 1rem; right: 1rem; height: 2px;
+    background: var(--red); transform: scaleX(0); transition: transform .2s;
+  }
+  nav ul li a:hover { color: var(--blue); }
+  nav ul li a:hover::after { transform: scaleX(1); }
+
+  .nav-cta {
+    background: var(--red); color: var(--white) !important;
+    padding: .45rem 1.2rem !important; border-radius: 3px;
+    transition: background .2s !important;
+  }
+  .nav-cta:hover { background: #a81820 !important; color: var(--white) !important; }
+  .nav-cta::after { display: none !important; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--blue-dark);
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    position: relative; overflow: hidden;
+    padding-top: 64px;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(26,111,181,.35) 0%, transparent 70%),
+      linear-gradient(135deg, #0a2f52 0%, #0f4a80 50%, #1a6fb5 100%);
+  }
+
+  /* diagonal red slash */
+  .hero-slash {
+    position: absolute; bottom: -5%; right: -2%;
+    width: 55%; height: 130%;
+    background: var(--red);
+    clip-path: polygon(18% 0%, 100% 0%, 100% 100%, 0% 100%);
+    opacity: .12;
+  }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 4rem 4rem 4rem 6rem;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--red); color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .75rem; letter-spacing: .14em;
+    text-transform: uppercase; padding: .3rem .8rem;
+    margin-bottom: 1.5rem;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+  }
+
+  .hero h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: .95; letter-spacing: -.01em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .hero h1 em { color: var(--red); font-style: normal; }
+
+  .hero p {
+    margin-top: 1.5rem;
+    font-size: 1.1rem; line-height: 1.7;
+    color: rgba(255,255,255,.72);
+    max-width: 440px;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--red); color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 1rem; letter-spacing: .08em;
+    text-transform: uppercase; text-decoration: none;
+    padding: .85rem 2rem; border-radius: 3px;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 20px rgba(208,34,42,.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(208,34,42,.5); }
+
+  .btn-outline {
+    background: transparent; color: var(--white);
+    border: 2px solid rgba(255,255,255,.4);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; font-size: 1rem; letter-spacing: .08em;
+    text-transform: uppercase; text-decoration: none;
+    padding: .85rem 2rem; border-radius: 3px;
+    transition: border-color .2s, background .2s;
+  }
+  .btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,.08); }
+
+  .hero-visual {
+    position: relative; z-index: 2;
+    display: flex; justify-content: center; align-items: center;
+    padding: 4rem 4rem 4rem 2rem;
+  }
+
+  /* fake scores widget */
+  .scores-card {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14);
+    backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 1.8rem;
+    width: 340px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+  .scores-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .8rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: 1rem;
+  }
+  .match {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .9rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .match:last-of-type { border-bottom: none; }
+  .match-teams { flex: 1; }
+  .match-teams strong {
+    display: block; font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 1rem; color: var(--white);
+  }
+  .match-teams span { font-size: .78rem; color: rgba(255,255,255,.45); }
+  .match-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 1.3rem; color: var(--white);
+    letter-spacing: .06em; min-width: 64px; text-align: right;
+  }
+  .match-score.win { color: #6ee870; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--black);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .stat {
+    padding: 2rem;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,.07);
+    position: relative;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 3rem;
+    line-height: 1; color: var(--white);
+  }
+  .stat-number span { color: var(--red); }
+  .stat-label {
+    font-size: .8rem; letter-spacing: .1em;
+    text-transform: uppercase; color: rgba(255,255,255,.4);
+    margin-top: .4rem;
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 6rem 6rem; }
+  .section-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .75rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: .6rem;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.0; letter-spacing: -.01em; text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 1rem;
+  }
+  .section-title em { color: var(--blue); font-style: normal; }
+
+  /* ── NIEUWS ── */
+  .news { background: var(--grey); }
+  .news-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; }
+  .news-header .btn-text {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: .9rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--blue); text-decoration: none; border-bottom: 2px solid var(--blue);
+    padding-bottom: 2px;
+  }
+
+  .news-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem; }
+
+  .news-card {
+    background: var(--white); border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    transition: transform .2s, box-shadow .2s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+  }
+  .news-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+
+  .news-card-img {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+    height: 200px; position: relative; overflow: hidden;
+    display: flex; align-items: flex-end;
+  }
+  .news-card:first-child .news-card-img { height: 280px; }
+  .news-card-img-inner {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0f4a80 0%, #1a6fb5 60%, #d0222a 100%);
+    opacity: .7;
+  }
+  .news-card-cat {
+    position: relative; z-index: 1;
+    background: var(--red); color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; padding: .25rem .6rem;
+    margin: 0 0 .8rem 1rem;
+  }
+
+  .news-card-body { padding: 1.2rem 1.4rem 1.6rem; flex: 1; display: flex; flex-direction: column; }
+  .news-card-date { font-size: .75rem; color: #999; margin-bottom: .5rem; }
+  .news-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 1.2rem; line-height: 1.25;
+    color: var(--black); margin-bottom: .6rem;
+  }
+  .news-card p { font-size: .88rem; color: #555; line-height: 1.6; flex: 1; }
+
+  /* ── TEAMS ── */
+  .teams { background: var(--white); }
+  .teams-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem;
+    margin-top: 3rem;
+  }
+  .team-card {
+    border: 2px solid var(--grey); border-radius: 8px;
+    padding: 1.8rem 1.4rem; text-align: center;
+    cursor: pointer; transition: border-color .2s, transform .2s;
+    text-decoration: none; color: inherit;
+  }
+  .team-card:hover { border-color: var(--blue); transform: translateY(-3px); }
+  .team-icon {
+    width: 48px; height: 48px; margin: 0 auto 1rem;
+    background: var(--blue); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 1.1rem; color: var(--white);
+  }
+  .team-icon.red { background: var(--red); }
+  .team-card h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 1.05rem; letter-spacing: .04em;
+    text-transform: uppercase; margin-bottom: .3rem;
+  }
+  .team-card p { font-size: .8rem; color: #777; }
+
+  /* ── MEEDOEN ── */
+  .meedoen {
+    background: var(--blue-dark); color: var(--white);
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 0; padding: 0;
+  }
+  .meedoen-block {
+    padding: 4rem 3rem;
+    border-right: 1px solid rgba(255,255,255,.1);
+    display: flex; flex-direction: column;
+    transition: background .25s;
+  }
+  .meedoen-block:last-child { border-right: none; }
+  .meedoen-block:hover { background: rgba(255,255,255,.05); }
+
+  .meedoen-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .meedoen-icon.blue { background: rgba(26,111,181,.3); }
+  .meedoen-icon.red { background: rgba(208,34,42,.3); }
+  .meedoen-icon.white { background: rgba(255,255,255,.12); }
+  .meedoen-icon svg { width: 24px; height: 24px; color: white; }
+
+  .meedoen-block h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 1.5rem; letter-spacing: .04em;
+    text-transform: uppercase; margin-bottom: .8rem; color: var(--white);
+  }
+  .meedoen-block p { font-size: .9rem; color: rgba(255,255,255,.6); line-height: 1.7; flex: 1; margin-bottom: 2rem; }
+  .btn-white {
+    display: inline-block;
+    border: 2px solid rgba(255,255,255,.3); color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: .9rem; letter-spacing: .1em; text-transform: uppercase;
+    padding: .7rem 1.4rem; border-radius: 3px; text-decoration: none;
+    transition: background .2s, border-color .2s; align-self: flex-start;
+  }
+  .btn-white:hover { background: var(--white); color: var(--blue-dark); border-color: var(--white); }
+
+  /* ── SPONSORS ── */
+  .sponsors { background: var(--grey); text-align: center; padding: 4rem 6rem; }
+  .sponsors .section-tag { margin-bottom: 1rem; }
+  .sponsors-row {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    align-items: center; gap: 1rem; margin-top: 2.5rem;
+  }
+  .sponsor-badge {
+    background: var(--white); border: 1px solid #e0e0e0;
+    border-radius: 6px; padding: .8rem 1.6rem;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: .95rem; letter-spacing: .04em; color: #555;
+    transition: border-color .2s, color .2s;
+  }
+  .sponsor-badge:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black); color: rgba(255,255,255,.5);
+    padding: 4rem 6rem 2rem;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-brand h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 1.6rem; letter-spacing: .04em;
+    color: var(--white); margin-bottom: .8rem;
+  }
+  .footer-brand p { font-size: .85rem; line-height: 1.7; max-width: 280px; }
+  .footer-brand address {
+    font-style: normal; font-size: .82rem; margin-top: 1rem; line-height: 1.8;
+  }
+  .footer-col h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: .8rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--white); margin-bottom: 1rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: .5rem; }
+  .footer-col ul li a {
+    color: rgba(255,255,255,.45); font-size: .85rem;
+    text-decoration: none; transition: color .2s;
+  }
+  .footer-col ul li a:hover { color: var(--white); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: .78rem;
+  }
+  .footer-accent { color: var(--red); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .hero-content { padding: 5rem 2rem 4rem; }
+    .stats-bar { grid-template-columns: repeat(2,1fr); }
+    .news-grid { grid-template-columns: 1fr; }
+    .teams-grid { grid-template-columns: repeat(2,1fr); }
+    .meedoen { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    section { padding: 4rem 2rem; }
+    nav ul { display: none; }
+    .sponsors { padding: 4rem 2rem; }
+    footer { padding: 3rem 2rem 2rem; }
+  }
+
+  /* animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-badge { animation: fadeUp .5s ease both; }
+  .hero h1    { animation: fadeUp .5s .1s ease both; }
+  .hero p     { animation: fadeUp .5s .2s ease both; }
+  .hero-actions { animation: fadeUp .5s .3s ease both; }
+  .scores-card { animation: fadeUp .5s .35s ease both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="36" height="36" viewBox="0 0 80 60">
+      <!-- outer blue oval -->
+      <ellipse cx="40" cy="22" rx="38" ry="14" fill="none" stroke="#1a6fb5" stroke-width="5"/>
+      <!-- grey stripes -->
+      <rect x="4" y="30" width="72" height="4" rx="2" fill="#aaa"/>
+      <rect x="4" y="37" width="72" height="4" rx="2" fill="#aaa"/>
+      <!-- red bottom arc -->
+      <path d="M 2 44 Q 40 62 78 44" fill="none" stroke="#d0222a" stroke-width="5" stroke-linecap="round"/>
+    </svg>
+    KV <span>ARENA</span>
+  </a>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Informatie</a></li>
+    <li><a href="#">Teams</a></li>
+    <li><a href="#">Uitslagen</a></li>
+    <li><a href="#">Sponsoring</a></li>
+    <li><a href="#" class="nav-cta">Lid worden</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding:0">
+  <div class="hero-bg"></div>
+  <div class="hero-slash"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">Korfbalvereniging · Rhenen</div>
+    <h1>Samen<br>spelen,<br><em>samen</em><br>winnen.</h1>
+    <p>Korfbalvereniging Arena is de sportieve thuis van Rhenen. Van mini's tot senioren — iedereen is welkom op Sportpark Candia.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Lid worden</a>
+      <a href="#" class="btn-outline">Wedstrijden &amp; uitslagen</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="scores-card">
+      <h3>📅 Komende wedstrijden</h3>
+      <div class="match">
+        <div class="match-teams">
+          <strong>Arena 1 – Dalto 1</strong>
+          <span>Zaterdag 5 apr · 14:00</span>
+        </div>
+        <div class="match-score">–</div>
+      </div>
+      <div class="match">
+        <div class="match-teams">
+          <strong>Arena 2 – Orion 3</strong>
+          <span>Zaterdag 5 apr · 15:30</span>
+        </div>
+        <div class="match-score">–</div>
+      </div>
+      <div class="match">
+        <div class="match-teams">
+          <strong>Arena A1 – Ons Eibernest A1</strong>
+          <span>Zondag 6 apr · 10:00</span>
+        </div>
+        <div class="match-score">–</div>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="#" style="color:#1a6fb5;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;">
+          Volledig programma →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-number">9<span>+</span></div>
+    <div class="stat-label">Teams</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">150<span>+</span></div>
+    <div class="stat-label">Leden</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">1970</div>
+    <div class="stat-label">Opgericht</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">1<span>e</span></div>
+    <div class="stat-label">Klasse senioren</div>
+  </div>
+</div>
+
+<!-- NIEUWS -->
+<section class="news">
+  <div class="news-header">
+    <div>
+      <div class="section-tag">Actueel</div>
+      <h2 class="section-title">Laatste <em>nieuws</em></h2>
+    </div>
+    <a href="#" class="btn-text">Alle berichten</a>
+  </div>
+  <div class="news-grid">
+    <a href="#" class="news-card">
+      <div class="news-card-img">
+        <div class="news-card-img-inner"></div>
+        <span class="news-card-cat">Sponsoring</span>
+      </div>
+      <div class="news-card-body">
+        <div class="news-card-date">19 februari 2025</div>
+        <h3>Nieuwe trainingskleding voor de jeugd van Arena!</h3>
+        <p>Dankzij een forse sponsorbijdrage draagt de gehele jeugd van Arena sinds kort nieuwe trainingspakken en shirts. Een grote stap voor de club.</p>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img" style="height:160px">
+        <div class="news-card-img-inner" style="background:linear-gradient(135deg,#0a2f52,#d0222a)"></div>
+        <span class="news-card-cat">Senioren</span>
+      </div>
+      <div class="news-card-body">
+        <div class="news-card-date">20 september 2024</div>
+        <h3>Selectie Arena met ervaren staf de competitie in</h3>
+        <p>De selectie wordt dit seizoen begeleid door een staf met jarenlange korfbalervaring.</p>
+      </div>
+    </a>
+    <a href="#" class="news-card">
+      <div class="news-card-img" style="height:160px">
+        <div class="news-card-img-inner" style="background:linear-gradient(135deg,#1a6fb5,#0a2f52)"></div>
+        <span class="news-card-cat">Seizoen</span>
+      </div>
+      <div class="news-card-body">
+        <div class="news-card-date">8 september 2024</div>
+        <h3>Zeer sterke seizoensopening voor Arena</h3>
+        <p>Ambitieuze korfballers van Arena trappen het seizoen sterk af met een indrukwekkende overwinning.</p>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- TEAMS -->
+<section class="teams">
+  <div class="section-tag">Onze vereniging</div>
+  <h2 class="section-title">Alle <em>teams</em></h2>
+  <div class="teams-grid">
+    <a href="#" class="team-card">
+      <div class="team-icon red">S1</div>
+      <h4>Senioren 1</h4>
+      <p>1e klasse</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon red">S2</div>
+      <h4>Senioren 2</h4>
+      <p>2e klasse</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon">S3</div>
+      <h4>Senioren 3</h4>
+      <p>3e klasse</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon">A1</div>
+      <h4>Team A1</h4>
+      <p>Junioren</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon">B1</div>
+      <h4>Team B1</h4>
+      <p>Junioren</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon">D1</div>
+      <h4>Team D1</h4>
+      <p>Jeugd</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon">E1</div>
+      <h4>Team E1</h4>
+      <p>Jeugd</p>
+    </a>
+    <a href="#" class="team-card">
+      <div class="team-icon red">SAM</div>
+      <h4>SAM / Mini's</h4>
+      <p>Kleinste korfballers</p>
+    </a>
+  </div>
+</section>
+
+<!-- MEEDOEN -->
+<div class="meedoen">
+  <div class="meedoen-block">
+    <div class="meedoen-icon blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <h3>Lid worden</h3>
+    <p>Wil jij korfballen bij Arena? We hebben teams voor alle leeftijden. Kom gewoon een keer trainen en ontdek de sport.</p>
+    <a href="#" class="btn-white">Aanmelden</a>
+  </div>
+  <div class="meedoen-block">
+    <div class="meedoen-icon white">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </div>
+    <h3>Vrijwilliger</h3>
+    <p>Viele handen maken licht werk. Zet je in als trainer, scheidsrechter, barmedewerker of bestuurslid.</p>
+    <a href="#" class="btn-white">Bekijk opties</a>
+  </div>
+  <div class="meedoen-block">
+    <div class="meedoen-icon red">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+    </div>
+    <h3>Sponsor worden</h3>
+    <p>Korfbalvereniging Arena biedt diverse sponsormogelijkheden voor bedrijven en organisaties in de regio Rhenen.</p>
+    <a href="#" class="btn-white">Sponsorpaketten</a>
+  </div>
+</div>
+
+<!-- SPONSORS -->
+<section class="sponsors">
+  <div class="section-tag">Onze partners</div>
+  <h2 class="section-title" style="font-size:1.8rem">Trots op onze <em>sponsors</em></h2>
+  <div class="sponsors-row">
+    <div class="sponsor-badge">Treshold</div>
+    <div class="sponsor-badge">ShortFinance</div>
+    <div class="sponsor-badge">Van de Peppel</div>
+    <div class="sponsor-badge">Cunera Vloerbedekking</div>
+    <div class="sponsor-badge">Progenta</div>
+    <div class="sponsor-badge">Jumbo Rhenen</div>
+    <div class="sponsor-badge">Gietvloeren B2B</div>
+    <div class="sponsor-badge">De Koning van Denemarken</div>
+    <div class="sponsor-badge">Vallei Gietvloeren</div>
+    <div class="sponsor-badge">Davelaar Sport</div>
+    <div class="sponsor-badge">Van Hees Salon</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h2>KV Arena</h2>
+      <p>Korfbalvereniging Arena is de thuisbasis voor korfballers in Rhenen en omgeving. Sportiever, gezelliger, samen.</p>
+      <address>
+        Sportpark "Candia"<br>
+        Grebbeweg 77a, 3911 AV Rhenen<br>
+        korfbalverenigingarena@gmail.com
+      </address>
+    </div>
+    <div class="footer-col">
+      <h4>Informatie</h4>
+      <ul>
+        <li><a href="#">Korfballen bij Arena</a></li>
+        <li><a href="#">Lid worden</a></li>
+        <li><a href="#">Trainingstijden</a></li>
+        <li><a href="#">Huisregels</a></li>
+        <li><a href="#">Vertrouwenspersoon</a></li>
+        <li><a href="#">Historie</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Teams</h4>
+      <ul>
+        <li><a href="#">Senioren 1</a></li>
+        <li><a href="#">Senioren 2</a></li>
+        <li><a href="#">Senioren 3</a></li>
+        <li><a href="#">A1 / B1 / D1</a></li>
+        <li><a href="#">E1 / E2 / F1</a></li>
+        <li><a href="#">SAM / Mini's</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <ul>
+        <li><a href="#">Alle uitslagen</a></li>
+        <li><a href="#">Wedstrijdprogramma</a></li>
+        <li><a href="#">Sponsorpakketten</a></li>
+        <li><a href="#">Privacybeleid</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Korfbalvereniging Arena, Rhenen</span>
+    <span>Gemaakt met <span class="footer-accent">♥</span> voor de korfbalsport</span>
+  </div>
+</footer>
+
+</body>
+</html>
