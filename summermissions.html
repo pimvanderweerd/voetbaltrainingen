@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candia MO17 Summer Missions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Barlow:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rood:#CC1719;
+    --rood-donker:#a01214;
+    --grijs:#f4f4f5;
+    --tekst:#222;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Barlow', sans-serif;
+    background:var(--grijs);
+    color:var(--tekst);
+    padding-bottom:40px;
+  }
+  header{
+    background:var(--rood);
+    color:#fff;
+    padding:18px 16px;
+    text-align:center;
+  }
+  header h1{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:800;
+    font-size:1.6rem;
+    letter-spacing:0.5px;
+  }
+  header p{
+    font-size:0.85rem;
+    opacity:0.9;
+    margin-top:4px;
+  }
+  .container{
+    max-width:600px;
+    margin:0 auto;
+    padding:16px;
+  }
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .tab{
+    flex:1;
+    padding:8px 4px;
+    text-align:center;
+    border-radius:10px;
+    background:#fff;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:0.8rem;
+    color:var(--rood);
+    border:2px solid var(--rood);
+    cursor:pointer;
+  }
+  .tab.active{
+    background:var(--rood);
+    color:#fff;
+  }
+  .card{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:2px solid #ddd;
+    font-size:1rem;
+    font-family:'Barlow', sans-serif;
+    background:#fff;
+  }
+  .progress-wrap{
+    margin-top:14px;
+  }
+  .progress-bar-bg{
+    background:#eee;
+    border-radius:8px;
+    height:14px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    background:var(--rood);
+    height:100%;
+    border-radius:8px;
+    transition:width 0.3s;
+  }
+  .progress-label{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:1.1rem;
+    margin-bottom:6px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .mission{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    border-radius:10px;
+    background:var(--grijs);
+    margin-bottom:8px;
+    cursor:pointer;
+    transition:background 0.15s;
+    user-select:none;
+  }
+  .mission.done{
+    background:#e9f7ec;
+  }
+  .mission-check{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:2px solid #ccc;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1rem;
+    color:#fff;
+    font-weight:700;
+  }
+  .mission.done .mission-check{
+    background:#2e9e4f;
+    border-color:#2e9e4f;
+  }
+  .mission-text{
+    font-weight:600;
+    font-size:1rem;
+  }
+  .mission.done .mission-text{
+    text-decoration:line-through;
+    color:#888;
+  }
+  .mission-num{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:800;
+    color:var(--rood);
+    width:28px;
+    text-align:center;
+    flex-shrink:0;
+    font-size:1rem;
+  }
+  .leader-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+  }
+  .leader-row:last-child{border-bottom:none;}
+  .leader-rank{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:800;
+    font-size:1.1rem;
+    color:var(--rood);
+    width:28px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .leader-name{
+    font-weight:600;
+    flex:1;
+  }
+  .leader-bar-bg{
+    background:#eee;
+    border-radius:6px;
+    height:10px;
+    flex:1.4;
+    overflow:hidden;
+  }
+  .leader-bar-fill{
+    background:var(--rood);
+    height:100%;
+    border-radius:6px;
+  }
+  .leader-count{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:0.9rem;
+    width:46px;
+    text-align:right;
+    flex-shrink:0;
+    color:#555;
+  }
+  .empty-msg{
+    text-align:center;
+    color:#999;
+    padding:30px 10px;
+    font-size:0.95rem;
+  }
+  .sync-bar{
+    text-align:center;
+    font-size:0.8rem;
+    padding:6px;
+    color:#888;
+  }
+  .sync-bar.error{
+    color:var(--rood);
+    cursor:pointer;
+    text-decoration:underline;
+  }
+  h2.section-title{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:1.2rem;
+    margin-bottom:12px;
+    color:var(--rood);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 Candia MO17 Summer Missions</h1>
+  <p>Hou bij welke missies je hebt voltooid deze zomer!</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <label for="speelsterSelect" style="font-weight:600; display:block; margin-bottom:8px;">Wie ben jij?</label>
+    <select id="speelsterSelect" onchange="kiesSpeelster()">
+      <option value="">-- Kies je naam --</option>
+    </select>
+  </div>
+
+  <div id="syncBar" class="sync-bar">Verbinden...</div>
+
+  <div class="tabs">
+    <div class="tab active" id="tabMissies" onclick="wisselTab('missies')">✅ Mijn missies</div>
+    <div class="tab" id="tabRanglijst" onclick="wisselTab('ranglijst')">📊 Ranglijst</div>
+    <div class="tab" id="tabStrijd" onclick="wisselTab('strijd')">⚔️ Vs Trainers</div>
+    <div class="tab" id="tabShirt" onclick="wisselTab('shirt')">👕 Shirt</div>
+  </div>
+
+  <div id="schermMissies">
+    <div id="missiesContent">
+      <div class="empty-msg">Kies eerst je naam om je missies te zien.</div>
+    </div>
+  </div>
+
+  <div id="schermRanglijst" style="display:none;">
+    <div class="card">
+      <h2 class="section-title">Ranglijst</h2>
+      <div id="ranglijstContent">
+        <div class="empty-msg">Laden...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="schermStrijd" style="display:none;">
+    <div class="card">
+      <h2 class="section-title">⚔️ Team vs Trainers</h2>
+      <div id="strijdContent">
+        <div class="empty-msg">Laden...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="schermShirt" style="display:none;">
+    <div class="card">
+      <h2 class="section-title">👕 Prematch Shirt Challenge</h2>
+      <p style="font-size:0.85rem; color:#888; margin-bottom:12px;">Bij 15 voltooide missies verdien je het prematch shirt!</p>
+      <div id="shirtContent">
+        <div class="empty-msg">Laden...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+
+// ===== Firebase config (zelfde project als trainingsplanner) =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDjTY6XFpfGdBt-8Iz7M1qWT44rys7uWi4",
+  authDomain: "app-voor-voetbaltrainingen.firebaseapp.com",
+  projectId: "app-voor-voetbaltrainingen",
+  storageBucket: "app-voor-voetbaltrainingen.firebasestorage.app",
+  messagingSenderId: "869029037781",
+  appId: "1:869029037781:web:84f134fcdc051f2567445c"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ===== Spelers =====
+const SPEELSTERS = ["Anne","Elisa","Emma","Fien","Isabella","Jill","Lauren","Lieke","Linde","Lynn","Marit","Nadelsa","Rosalie","Ruby","Tara","Veerle"];
+const TRAINERS = ["Pim","Michel"];
+const IEDEREEN = SPEELSTERS.concat(TRAINERS);
+
+// ===== Missies =====
+const MISSIES = [
+  "De Verdediger",
+  "De Flankspeler",
+  "De Aanjager",
+  "De Jager",
+  "De Motor",
+  "De Nummer 10",
+  "De Leider",
+  "De Strijder",
+  "De Afmaker",
+  "De Teamspeler",
+  "De Pressing Machine",
+  "De Box-to-Box",
+  "Herstel",
+  "Herstel Plus",
+  "De Motor 2.0",
+  "De Buitenspeler",
+  "De Aanvoerder",
+  "De Warrior",
+  "Klaar voor het Seizoen",
+  "Candia Warrior"
+];
+
+function isOntgrendeld(naam){
+  return sessionStorage.getItem('smUnlocked_' + naam) === 'true';
+}
+
+const ADMIN_CODE = "6677";
+
+function controleerPin(naam){
+  if(isOntgrendeld(naam)) return true;
+
+  const bestaandePin = (alleData[naam] || {}).pin;
+
+  if(!bestaandePin){
+    const nieuw = prompt(`Stel een geheime 4-cijferige code in voor ${naam} (onthoud deze goed!):`);
+    if(!nieuw || !/^\d{4}$/.test(nieuw)){
+      alert('Ongeldige code. Gebruik precies 4 cijfers.');
+      return false;
+    }
+    if(!alleData[naam]) alleData[naam] = { voltooid: [] };
+    alleData[naam].pin = nieuw;
+    db.collection('summerMissions').doc(naam).set({ pin: nieuw }, { merge: true });
+    sessionStorage.setItem('smUnlocked_' + naam, 'true');
+    return true;
+  }
+
+  const invoer = prompt(`Voer de code in voor ${naam}:`);
+  if(invoer === bestaandePin || invoer === ADMIN_CODE){
+    sessionStorage.setItem('smUnlocked_' + naam, 'true');
+    return true;
+  }
+  alert('Onjuiste code.');
+  return false;
+}
+
+let huidigeSpeler = localStorage.getItem('summerMissionsSpeler') || "";
+let alleData = {}; // { naam: [missie indices voltooid] }
+let pollInterval = null;
+
+// ===== Init =====
+function initSelect(){
+  const sel = document.getElementById('speelsterSelect');
+  const groepSpelers = document.createElement('optgroup');
+  groepSpelers.label = 'Speelsters';
+  SPEELSTERS.forEach(naam => {
+    const opt = document.createElement('option');
+    opt.value = naam;
+    opt.textContent = naam;
+    groepSpelers.appendChild(opt);
+  });
+  sel.appendChild(groepSpelers);
+
+  const groepTrainers = document.createElement('optgroup');
+  groepTrainers.label = 'Trainers';
+  TRAINERS.forEach(naam => {
+    const opt = document.createElement('option');
+    opt.value = naam;
+    opt.textContent = naam + ' (trainer)';
+    groepTrainers.appendChild(opt);
+  });
+  sel.appendChild(groepTrainers);
+
+  if(huidigeSpeler){
+    sel.value = huidigeSpeler;
+  }
+}
+
+function kiesSpeelster(){
+  const sel = document.getElementById('speelsterSelect');
+  huidigeSpeler = sel.value;
+  localStorage.setItem('summerMissionsSpeler', huidigeSpeler);
+  renderMissies();
+}
+
+function wisselTab(tab){
+  document.getElementById('tabMissies').classList.toggle('active', tab==='missies');
+  document.getElementById('tabRanglijst').classList.toggle('active', tab==='ranglijst');
+  document.getElementById('tabStrijd').classList.toggle('active', tab==='strijd');
+  document.getElementById('tabShirt').classList.toggle('active', tab==='shirt');
+  document.getElementById('schermMissies').style.display = tab==='missies' ? 'block' : 'none';
+  document.getElementById('schermRanglijst').style.display = tab==='ranglijst' ? 'block' : 'none';
+  document.getElementById('schermStrijd').style.display = tab==='strijd' ? 'block' : 'none';
+  document.getElementById('schermShirt').style.display = tab==='shirt' ? 'block' : 'none';
+  if(tab==='ranglijst') renderRanglijst();
+  if(tab==='strijd') renderStrijd();
+  if(tab==='shirt') renderShirt();
+}
+
+// ===== Data laden =====
+function laadData(){
+  const syncBar = document.getElementById('syncBar');
+  syncBar.textContent = 'Verbinden...';
+  syncBar.classList.remove('error');
+
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+  const fetchData = db.collection('summerMissions').get();
+
+  Promise.race([fetchData, timeout]).then(snapshot => {
+    alleData = {};
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      alleData[doc.id] = { voltooid: data.voltooid || [], pin: data.pin || null };
+    });
+    syncBar.textContent = '🟢 Verbonden';
+    renderMissies();
+    if(document.getElementById('schermRanglijst').style.display !== 'none'){
+      renderRanglijst();
+    }
+    if(document.getElementById('schermStrijd').style.display !== 'none'){
+      renderStrijd();
+    }
+    if(document.getElementById('schermShirt').style.display !== 'none'){
+      renderShirt();
+    }
+  }).catch(err => {
+    syncBar.textContent = '🔴 Verbindingsfout — Opnieuw proberen';
+    syncBar.classList.add('error');
+    syncBar.onclick = laadData;
+    console.error(err);
+  });
+}
+
+// ===== Missie toggelen =====
+function toggleMissie(index){
+  if(!huidigeSpeler) return;
+  if(!controleerPin(huidigeSpeler)) return;
+  if(!alleData[huidigeSpeler]) alleData[huidigeSpeler] = { voltooid: [], pin: null };
+  const lijst = alleData[huidigeSpeler].voltooid;
+  const pos = lijst.indexOf(index);
+  if(pos === -1){
+    lijst.push(index);
+  } else {
+    lijst.splice(pos, 1);
+  }
+  renderMissies();
+  opslaan(huidigeSpeler, lijst);
+}
+
+function opslaan(naam, lijst){
+  db.collection('summerMissions').doc(naam).set({ voltooid: lijst }, { merge: true })
+    .then(() => {
+      const syncBar = document.getElementById('syncBar');
+      syncBar.textContent = '🟢 Verbonden';
+      syncBar.classList.remove('error');
+    })
+    .catch(err => {
+      const syncBar = document.getElementById('syncBar');
+      syncBar.textContent = '🔴 Opslaan mislukt — Opnieuw proberen';
+      syncBar.classList.add('error');
+      syncBar.onclick = () => opslaan(naam, lijst);
+      console.error(err);
+    });
+}
+
+// ===== Render: mijn missies =====
+function renderMissies(){
+  const el = document.getElementById('missiesContent');
+  if(!huidigeSpeler){
+    el.innerHTML = '<div class="empty-msg">Kies eerst je naam om je missies te zien.</div>';
+    return;
+  }
+  const voltooid = (alleData[huidigeSpeler] || {}).voltooid || [];
+  const pct = Math.round((voltooid.length / MISSIES.length) * 100);
+
+  let html = `<div class="card">
+    <div class="progress-label"><span>${huidigeSpeler}</span><span>${voltooid.length} / ${MISSIES.length}</span></div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+  </div>`;
+
+  html += '<div class="card">';
+  MISSIES.forEach((naam, i) => {
+    const done = voltooid.includes(i);
+    html += `<div class="mission ${done?'done':''}" onclick="toggleMissie(${i})">
+      <div class="mission-num">${i+1}</div>
+      <div class="mission-check">${done?'✓':''}</div>
+      <div class="mission-text">${naam}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// ===== Render: ranglijst =====
+function renderRanglijst(){
+  const el = document.getElementById('ranglijstContent');
+  const rij = IEDEREEN.map(naam => {
+    const aantal = ((alleData[naam] || {}).voltooid || []).length;
+    return { naam, aantal, isTrainer: TRAINERS.includes(naam) };
+  }).sort((a,b) => b.aantal - a.aantal);
+
+  let html = '';
+  rij.forEach((r, i) => {
+    const pct = Math.round((r.aantal / MISSIES.length) * 100);
+    const label = r.isTrainer ? r.naam + ' 🧢' : r.naam;
+    const kleur = r.isTrainer ? 'style="color:var(--rood-donker);"' : '';
+    html += `<div class="leader-row">
+      <div class="leader-rank">${i+1}</div>
+      <div class="leader-name" ${kleur}>${label}</div>
+      <div class="leader-bar-bg"><div class="leader-bar-fill" style="width:${pct}%; ${r.isTrainer?'background:#444;':''}"></div></div>
+      <div class="leader-count">${r.aantal}/${MISSIES.length}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ===== Render: strijd team vs trainers (per speler) =====
+function renderStrijd(){
+  const el = document.getElementById('strijdContent');
+
+  const trainerTotaal = TRAINERS.reduce((sum, naam) => sum + ((alleData[naam] || {}).voltooid || []).length, 0);
+  const trainerGemiddelde = trainerTotaal / TRAINERS.length;
+
+  let html = `<div style="text-align:center; margin-bottom:14px; font-size:0.9rem; color:#666;">
+    Trainersgemiddelde: <strong>${trainerGemiddelde.toFixed(1)} / ${MISSIES.length}</strong> missies
+  </div>`;
+  html += '<hr style="border:none; border-top:1px solid #eee; margin-bottom:12px;">';
+
+  // Speelsters gesorteerd: voor -> gelijk -> achter, en binnen elke groep op aantal
+  const rij = SPEELSTERS.map(naam => {
+    const aantal = ((alleData[naam] || {}).voltooid || []).length;
+    const verschil = aantal - trainerGemiddelde;
+    return { naam, aantal, verschil };
+  }).sort((a,b) => b.verschil - a.verschil);
+
+  rij.forEach(r => {
+    let icoon, tekst, kleur;
+    if(r.verschil > 0.05){
+      icoon = '🟢';
+      tekst = `+${r.verschil.toFixed(1)} voor`;
+      kleur = '#2e9e4f';
+    } else if(r.verschil < -0.05){
+      icoon = '🔴';
+      tekst = `${r.verschil.toFixed(1)} achter`;
+      kleur = 'var(--rood)';
+    } else {
+      icoon = '⚪';
+      tekst = 'gelijk';
+      kleur = '#888';
+    }
+    html += `<div class="leader-row">
+      <div class="leader-rank">${icoon}</div>
+      <div class="leader-name">${r.naam}</div>
+      <div class="leader-count" style="width:auto; color:${kleur}; font-weight:700;">${tekst}</div>
+      <div class="leader-count">${r.aantal}/${MISSIES.length}</div>
+    </div>`;
+  });
+
+  html += '<hr style="border:none; border-top:1px solid #eee; margin:14px 0 10px;">';
+  html += '<div style="font-size:0.85rem; color:#888; margin-bottom:8px;">Trainers:</div>';
+
+  TRAINERS.forEach(naam => {
+    const aantal = ((alleData[naam] || {}).voltooid || []).length;
+    html += `<div class="leader-row">
+      <div class="leader-rank">🧢</div>
+      <div class="leader-name">${naam}</div>
+      <div class="leader-count">${aantal}/${MISSIES.length}</div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ===== Render: prematch shirt challenge =====
+function renderShirt(){
+  const el = document.getElementById('shirtContent');
+  const DOEL = 15;
+
+  const rij = SPEELSTERS.map(naam => {
+    const aantal = ((alleData[naam] || {}).voltooid || []).length;
+    const nodig = Math.max(0, DOEL - aantal);
+    return { naam, aantal, nodig };
+  }).sort((a,b) => a.nodig - b.nodig);
+
+  let html = '';
+  rij.forEach(r => {
+    const pct = Math.min(100, Math.round((r.aantal / DOEL) * 100));
+    const status = r.nodig === 0
+      ? '👕 Shirt verdiend!'
+      : `nog ${r.nodig} te gaan`;
+    const kleur = r.nodig === 0 ? '#2e9e4f' : '#888';
+    html += `<div style="margin-bottom:12px;">
+      <div class="progress-label">
+        <span>${r.naam}</span>
+        <span style="color:${kleur};">${status}</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%; ${r.nodig===0?'background:#2e9e4f;':''}"></div></div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ===== Start =====
+initSelect();
+laadData();
+pollInterval = setInterval(laadData, 30000);
+window.toggleMissie = toggleMissie;
+window.kiesSpeelster = kiesSpeelster;
+window.wisselTab = wisselTab;
+
+</script>
+</body>
+</html>
